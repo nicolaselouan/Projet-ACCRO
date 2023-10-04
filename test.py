@@ -1,2 +1,2 @@
 import numpy as np
-print(np.sqrt(2))
+print("Le résultat est :", np.sqrt(2))
