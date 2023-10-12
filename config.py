@@ -1,10 +1,67 @@
-import tkinter as tk   
+import tkinter as tk
+def clic(event):
+    """ Gestion de l'événement Clic gauche """
+    global DETECTION_CLIC_SUR_OBJET, bloc_courant_id
 
+    # position du pointeur de la souris
+    x = event.x
+    y = event.y
+    #print("Position du clic -> ", x, y)
+
+    for bloc_id, texte_id in dico_blocs.items():
+        coords = cadre_blocs_a_placer.coords(bloc_id)
+        #print("Les coordonnées sont ->", coords)
+        x_min, y_min, x_max, y_max = coords
+
+        if x_min <= x <= x_max and y_min <= y <= y_max:
+            DETECTION_CLIC_SUR_OBJET = True
+            bloc_courant_id = bloc_id
+            print("DETECTION CLIC SUR OBJET -> ", DETECTION_CLIC_SUR_OBJET)
+        else:
+            DETECTION_CLIC_SUR_OBJET = False
+ 
+def drag(event):
+    # Position du pointeur de la souris
+    x = event.x + (LargeurBloc / 2)
+    y = event.y + (HauteurBloc / 2)
+
+    cadre_width = cadre_blocs_a_placer.winfo_width()
+    cadre_height = cadre_blocs_a_placer.winfo_height()
+
+    for bloc_id in dico_blocs.values():
+            # limite de l'objet dans la zone graphique
+            if x < LargeurBloc:
+                x = LargeurBloc
+            if x > cadre_width - LargeurBloc:
+                x = cadre_width
+            if y < HauteurBloc:
+                y = HauteurBloc
+            if y > cadre_height - HauteurBloc:
+                y = cadre_height  
+            # mise à jour de la position du bloc
+            cadre_blocs_a_placer.coords(bloc_courant_id, [x - LargeurBloc, y - HauteurBloc, x, y])
+
+            # mise à jour de la position du texte
+            x_texte = (x - LargeurBloc + x) / 2
+            y_texte = (y - HauteurBloc + y) / 2
+            cadre_blocs_a_placer.coords(dico_blocs[bloc_courant_id], x_texte, y_texte)
+
+
+def init_positions_blocs():
+    for bloc_id in dico_blocs.values():
+        # Récupérez les coordonnées initiales de chaque bloc et stockez-les dans le dictionnaire
+        positions_blocs[bloc_id] = cadre_blocs_a_placer.coords(bloc_id)
+
+#Variables globales
+DETECTION_CLIC_SUR_OBJET = False
+bloc_courant_id = None
+
+# Dictionnaire pour stocker les positions des blocs
+positions_blocs = {}
+
+#Initialisation de la fenêtre
 fenetre = tk.Tk()
-fenetre.title("Interface des zones avec des blocs")
-
-# Ajuster la taille initiale de la fenêtre
-fenetre.geometry("1300x1000")  # Largeur x Hauteur
+fenetre.title("Interface avec des blocs")
 
 Largeur = 1300
 Hauteur = 800
@@ -12,8 +69,9 @@ LargeurBloc = 50
 HauteurBloc = 25
 
 # Cadre principal pour aligner les zones horizontalement
-cadre_principal = tk.Frame(fenetre)
-cadre_principal.pack(fill=tk.BOTH, expand=True)
+cadre_principal = tk.Canvas(fenetre, width=Largeur, height=Hauteur)
+cadre_principal.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+cadre_principal.focus_set()
 
 # Cadre pour "Déchargement" et "Bloc à placer"
 cadre_droite = tk.Canvas(cadre_principal, bg='lightgrey', relief="solid", bd=2)
@@ -38,11 +96,14 @@ cadre_blocs_a_placer.pack(fill=tk.BOTH, expand=True)
 # On dessine la fenêtre avant pour récupérer les coordonnées du cadre "Bloc à placer"
 fenetre.update()
 
-# Nombre de blocs par ligne
-blocs_par_ligne = 5
+# Nombre de blocs par ligne dans le cadre bloc_a_placer
+blocs_par_ligne = 7
+
+# Un dictionnaire pour stocker les paires d'IDs de rectangle (clé) et de texte (valeur)
+dico_blocs = {}  
 
 # Ajouter des petits blocs maniables dans la zone "Bloc à placer"
-for i in range(1, 25):
+for i in range(1, 10):
     x1 = (i - 1) % blocs_par_ligne * LargeurBloc
     y1 = (i - 1) // blocs_par_ligne * HauteurBloc
     x2 = x1 + LargeurBloc
@@ -50,25 +111,19 @@ for i in range(1, 25):
     
     # Dessiner un rectangle avec les caractéristiques souhaitées
     bloc_rectangle = cadre_blocs_a_placer.create_rectangle(x1, y1, x2, y2, fill="lightgrey", outline="black", width=2)
-    
+
     # Ajouter du texte au milieu du rectangle
     texte = f"Bloc {i}"
     x_texte = (x1 + x2) / 2
     y_texte = (y1 + y2) / 2
-    cadre_blocs_a_placer.create_text(x_texte, y_texte, text=texte, font=("Helvetica", 10, "bold"))
+    texte_id = cadre_blocs_a_placer.create_text(x_texte, y_texte, text=texte, font=("Helvetica", 10, "bold"))
     
-    #Obtenir coordonées
-    x_cadre, y_cadre = cadre_blocs_a_placer.winfo_rootx(), cadre_blocs_a_placer.winfo_rooty()
-    print("Position cadre par rapport à fenêtre ->", x_cadre, y_cadre)
-    coords = cadre_blocs_a_placer.coords(bloc_rectangle)
-    x_min, y_min, x_max, y_max = coords
+    # Stocker l'ID du texte dans le dictionnaire (valeur) avec l'ID du rectangle correspondant (clé)
+    dico_blocs[bloc_rectangle] = texte_id
 
-    x_min_fenetre = x_cadre + x_min
-    y_min_fenetre = y_cadre + y_min
-    x_max_fenetre = x_cadre + x_max
-    y_max_fenetre = y_cadre + y_max
-
-    print("Position objet par rapport à la fenêtre ->", x_min_fenetre, y_min_fenetre, x_max_fenetre, y_max_fenetre)
+# Initialise les positions des blocs au démarrage
+init_positions_blocs()
+print("Coordonnées blocs ->", positions_blocs)
 
 # Cadre pour "A", "B" et "C" superposées verticalement à gauche
 cadre_zones = tk.Canvas(cadre_principal, bg='lightgrey', relief="solid", bd=2)
@@ -98,7 +153,13 @@ label_c.pack()
 cadre_c = tk.Canvas(cadre_zones, bg="white", borderwidth=2, relief="solid")
 cadre_c.pack(fill=tk.BOTH, expand=True, padx=(0, 10), pady=(0, 10))
 
+# La méthode bind() permet de lier un événement avec une fonction
+cadre_blocs_a_placer.bind('<Button-1>', clic)  # événement clic gauche (press)
+cadre_blocs_a_placer.bind('<B1-Motion>', drag)  # événement bouton gauche enfoncé (hold down)
+
 fenetre.mainloop()
+
+
 
 
 
