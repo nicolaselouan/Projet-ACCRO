@@ -1,5 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import matplotlib.pyplot as plt
 
 #Entrées de la fenêtre pour tester l'algorithme
 colis_placer = [["Bloc 1", 50, 25, "A", (10,20)], ["Bloc 2", 60, 50, "B", (10,20)], 
@@ -9,6 +12,30 @@ colis_placer = [["Bloc 1", 50, 25, "A", (10,20)], ["Bloc 2", 60, 50, "B", (10,20
 
 colis_pas_placer = [["Bloc 6", 90, 45, 0, (0,0)], ["Bloc 7", 150, 150, 0, (0,0)],
 ["Bloc 8", 120, 120, 0, (0,0)], ["Bloc 9", 65, 100, 0, (0,0)], ["Bloc 10", 80, 75, 0, (0,0)]]
+
+dico_graphs_1 = {15 : [0.3,2], 25 : [0.8, 4], 100 : [1.7, 17], 85 : [1.5, 14], 50 : [1, 6], 5 : [0.2, 0], 35 : [0.6, 7], 65 : [1.1, 12], 110 : [1.9, 23], 70 : [1.1, 16], 40 : [0.6, 5]}
+dico_graphs_2 = {15 : [0.2,4], 25 : [0.7, 7], 100 : [1.3, 24], 85 : [1.2, 17], 50 : [0.8, 8], 5 : [0.05, 2], 35 : [0.3, 9], 65 : [0.8, 18], 110 : [1.4, 30], 70 : [0.9, 20], 40 : [0.2, 6]}
+dico_graphs_3 = {15 : [0.4,0], 25 : [1.0, 3], 100 : [1.6, 14], 85 : [1.6, 10], 50 : [1.3, 4], 5 : [0.5, 0], 35 : [0.9, 4], 65 : [1.5, 8], 110 : [3.0, 12], 70 : [1.7, 9], 40 : [0.9, 4]}
+
+#Graphiques 
+
+# Trier les dictionnaires selon la clé 'nombre_de_blocs'
+dico_graphs_1 = dict(sorted(dico_graphs_1.items()))
+dico_graphs_2 = dict(sorted(dico_graphs_2.items()))
+dico_graphs_3 = dict(sorted(dico_graphs_3.items()))
+
+
+nombre_de_blocs_1 = list(dico_graphs_1.keys())
+nombre_de_blocs_2 = list(dico_graphs_2.keys())
+nombre_de_blocs_3 = list(dico_graphs_3.keys())
+
+temps_execution_1 = [value[0] for value in dico_graphs_1.values()]
+temps_execution_2 = [value[0] for value in dico_graphs_2.values()]
+temps_execution_3 = [value[0] for value in dico_graphs_3.values()]
+
+nombre_echecs_1 = [value[1] for value in dico_graphs_1.values()]
+nombre_echecs_2 = [value[1] for value in dico_graphs_2.values()]
+nombre_echecs_3 = [value[1] for value in dico_graphs_3.values()]
 
 # Variables globales pour la zone A
 DETECTION_CLIC_SUR_OBJET_A = False
@@ -317,60 +344,67 @@ def placer_bloc(bloc):
     # Incrémenter le compteur d'identifiant de bloc
     bloc_counter += 1
 
+# Fonction pour afficher les courbes d'analyse
+def afficher_courbes_analyse():
+    # Créer les graphiques
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+
+    # Tracer les courbes pour les temps d'exécution
+    ax1.plot(nombre_de_blocs_1, temps_execution_1, label='Temps d\'exécution solution_1', marker='o', linestyle='-.', color='b')
+    ax1.plot(nombre_de_blocs_2, temps_execution_2, label='Temps d\'exécution solution_2', marker='o', linestyle='-.', color='g')
+    ax1.plot(nombre_de_blocs_3, temps_execution_3, label='Temps d\'exécution solution_3', marker='o', linestyle='-.', color='r')
+
+    # Configurer les détails du graphique 1
+    ax1.set_xlabel('Nombre de blocs')
+    ax1.set_ylabel('Temps d\'exécution (s)')
+    ax1.set_title('Comparaison des solutions - Temps d\'exécution')
+    ax1.legend()
+    ax1.grid(True)
+
+    # Tracer les courbes pour le nombre d'échecs
+    ax2.plot(nombre_de_blocs_1, nombre_echecs_1, label='Nombre d\'échecs solution_1', marker='o', linestyle='--', color='b')
+    ax2.plot(nombre_de_blocs_2, nombre_echecs_2, label='Nombre d\'échecs solution_2', marker='o', linestyle='--', color='g')
+    ax2.plot(nombre_de_blocs_3, nombre_echecs_3, label='Nombre d\'échecs solution_3', marker='o', linestyle='--', color='r')
+
+    # Configurer les détails du graphique 2
+    ax2.set_xlabel('Nombre de blocs')
+    ax2.set_ylabel('Nombre d\'échecs')
+    ax2.set_title('Comparaison des solutions - Nombre d\'échecs')
+    ax2.legend()
+    ax2.grid(True)
+
+    # Créer une nouvelle fenêtre Tkinter pour afficher les graphiques
+    new_window = tk.Toplevel(fenetre)
+    new_window.title('Courbes d\'analyse')
+
+    # Incorporer les graphiques dans la fenêtre Tkinter
+    canvas = FigureCanvasTkAgg(fig, master=new_window)
+    canvas.draw()
+    canvas.get_tk_widget().pack()
+
 # Créer la liste des tâches à effectuer
 for bloc in colis_placer:
     taches.append(bloc)
-
-# Seconde liste des tâches à effectuer
-taches2 = taches
 
 curseur_avancement = tk.Scale(cadre_droite, from_= 0, to=len(colis_placer), orient="horizontal", label="     Curseur", borderwidth=2, relief="raised", fg = "black", bg = "white", activebackground = "black", font=("Helvetica", 10, "bold"))
 curseur_avancement.set(0)  # Initialiser avec la valeur maximale
 curseur_avancement.pack()
 
-etats_precedents = []  # Liste pour stocker les états précédents des blocs
-
+# Fonction de mise à jour de l'affichage en fonction de la position du curseur
 def ajuster_avancement(*args):
-    index = curseur_avancement.get() - 1
-    index_inversee = len(etats_precedents) - 1 - index
-    if index_inversee >= 0:
-        supprimer_blocs(cadre_A)
-        supprimer_blocs(cadre_B)
-        supprimer_blocs(cadre_C)
-        dico_blocs.clear()
-        taches.clear()
-        for bloc in etats_precedents[index_inversee]:
-            taches.append(bloc)
-        if current_task_id:
-            fenetre.after_cancel(current_task_id)   
-        executer_taches()
-
+    index = curseur_avancement.get()
+    supprimer_blocs(cadre_A)
+    supprimer_blocs(cadre_B)
+    supprimer_blocs(cadre_C)
+    dico_blocs.clear()
+    for i in range(index):
+        placer_bloc(colis_placer[i])
+    label_compteur.config(text=f"Nombre de blocs restants à placer : {len(colis_placer)-index}")    
+# Lier le curseur à la fonction de mise à jour
 curseur_avancement.bind("<ButtonRelease-1>", ajuster_avancement)
-
-# Construire les variables du curseur
-for i in range(len(taches2)):
-    etats_precedents.append(list(taches2))
-    taches2.pop(-1)
 
 # Définir une variable pour stocker l'ID de la tâche en cours
 current_task_id = None
-
-# Fonction pour exécuter les tâches
-def executer_taches():
-    global current_task_id
-    if taches:
-        bloc = taches.pop(0)
-        placer_bloc(bloc)
-        label_compteur.config(text=f"Nombre de blocs restants à placer : {len(taches)}")
-        current_task_id = fenetre.after(1500, executer_taches)
-    else:
-        current_task_id = None
-# Appel initial de la fonction d'exécution des tâches
-executer_taches()
-
-def supprimer_blocs(canvas):
-    for item in canvas.find_all():
-        canvas.delete(item)
 
 # Dans votre gestionnaire d'événements pour le menu déroulant
 def on_select_solution(event):
@@ -382,22 +416,34 @@ def on_select_solution(event):
     supprimer_blocs(cadre_A)
     supprimer_blocs(cadre_B)
     supprimer_blocs(cadre_C)
-
     dico_blocs = {}  
 
     # Annuler les tâches en cours
     taches.clear()
+    index = curseur_avancement.get()
+    for i in range(index):
+        placer_bloc(colis_placer[i])
+    label_compteur.config(text=f"Nombre de blocs restants à placer : {len(colis_placer)-index}")     
 
-    index = curseur_avancement.get() - 1
-    index_inversee = len(etats_precedents) - 1 - index
-    for bloc in etats_precedents[index_inversee]:
-        taches.append(bloc)
+# Fonction pour exécuter les tâches
+def executer_taches():
+    global current_task_id
+    if taches:
+        bloc = taches.pop(0)
+        placer_bloc(bloc)
+        label_compteur.config(text=f"Nombre de blocs restants à placer : {len(taches)}")
+        current_task_id = fenetre.after(1500, executer_taches)
+    else:
+        current_task_id = None
 
-    executer_taches()
+def supprimer_blocs(canvas):
+    for item in canvas.find_all():
+        canvas.delete(item)
 
 # Fonction bouton reset
 def reset_solution():
-    global current_task_id, dico_blocs, en_pause, etats_precedents
+    global current_task_id, dico_blocs, en_pause
+    index = curseur_avancement.get()
     en_pause = False
     if current_task_id:
         fenetre.after_cancel(current_task_id)
@@ -408,12 +454,9 @@ def reset_solution():
     supprimer_blocs(cadre_C)
     dico_blocs = {}
 
-    if curseur_avancement.get() != 0:
-        taches.clear()
-        index = curseur_avancement.get() - 1
-        for bloc in etats_precedents[len(etats_precedents) - 1 - index]:
-            taches.append(bloc)
-    executer_taches()
+    for bloc in colis_placer:
+        taches.append(bloc)
+    label_compteur.config(text=f"Nombre de blocs restants à placer : {index}")
 
 en_pause = False
 
@@ -429,13 +472,35 @@ def mettre_en_pause():
             current_task_id = None
         en_pause = True
 
+def lancer_placement_blocs():
+    global current_task_id
+    if current_task_id is None:
+        index = curseur_avancement.get()
+        supprimer_blocs(cadre_A)
+        supprimer_blocs(cadre_B)
+        supprimer_blocs(cadre_C)
+        dico_blocs = {}
+        taches.clear()
+        for i in range(index):
+            taches.append(colis_placer[i])
+        label_compteur.config(text=f"Nombre de blocs restants à placer : {len(colis_placer)-index}")
+        executer_taches()
+
+# Créer le bouton "Courbes d'analyse"
+bouton_courbes_analyse = tk.Button(cadre_droite, text="Courbes d'analyse", bg="yellow", fg="black", relief="raised", command=afficher_courbes_analyse)
+bouton_courbes_analyse.pack(side="top", padx=10, pady=10)
+
 # Création du bouton Reset
 bouton_reset = tk.Button(cadre_droite, text="Reset", bg="red", fg="white", relief="raised", command=reset_solution)
 bouton_reset.pack(side="bottom", padx=10, pady=10)
 
+# Création du bouton Launch
+bouton_launch = tk.Button(cadre_droite, text="Launch", bg="blue", fg="white", relief="raised", command=lancer_placement_blocs)
+bouton_launch.pack(padx=10, pady=10)
+
 # Création du bouton Pause/Play
 bouton_pause_play = tk.Button(cadre_droite, text="Pause/Play", bg="green", fg="white", relief="raised", command=mettre_en_pause)
-bouton_pause_play.pack(side="bottom", padx=10, pady=10)
+bouton_pause_play.pack(padx=10, pady=10)
 
 menu_deroulant.bind("<<ComboboxSelected>>", on_select_solution)
 
