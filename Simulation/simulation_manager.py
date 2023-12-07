@@ -1,7 +1,9 @@
 from Data.data_manager import DataManager
 from pathlib import Path
 from Simulation.strategy import Strategy
-from Simulation.strategy_1 import Strategy1
+from Simulation.strategy_Florian import StrategyFlorian
+from Simulation.strategy_Hamidou import StrategyHamidou
+from Simulation.strategy_Elouan import StrategyElouan
 from Simulation.strategy_2 import Strategy2
 from Simulation.solution_comparateur  import SolutionComparateur
 

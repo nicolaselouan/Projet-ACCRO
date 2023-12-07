@@ -11,13 +11,19 @@ class SolutionComparateur:
             
             #calcul de l'exactitude
             nb_echecs=0
-            accuracy=0
-            for i in range(len(context.modified_data.blocs)):
-                if context.modified_data.blocs[i].position.zone==context.modified_data.zones[0]:
+            total_superficy=0
+            unplaced_superficy=0
+            
+            for bloc in context.modified_data.blocs:
+                
+                total_superficy+=bloc.width*bloc.length
+                
+                if bloc.position.zone==context.modified_data.zones[0]:
                     nb_echecs+=1
-            accuracy=1-nb_echecs/len(context.modified_data.blocs)
+                    unplaced_superficy+=bloc.width*bloc.length
+
            
 
-            self.comparaison_results[context.strategy_name]=(context.execution_time, accuracy)
+            self.comparaison_results[context.strategy_name]=(context.execution_time, 1-nb_echecs/len(context.modified_data.blocs), 1-unplaced_superficy/total_superficy)
             
         return self.comparaison_results

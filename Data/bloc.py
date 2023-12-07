@@ -13,7 +13,7 @@ class Bloc:
         self.departure_date = departure_date
         self.half_height_date : float = half_height_date
         self.final_height_date : float = final_height_date
-        self.position : Position = None
+        self.position : Position=None
         self.is_placed : bool = False
     
     def update_height(self, new_height):
@@ -21,10 +21,10 @@ class Bloc:
                                ## date=final_height_date : height <- final_height
                                ## on test la date en externe (dans les algorithmes de résolution)
         
-    def place(self, zone, x,y):
+    def place(self, position):
         assert not self.is_placed ## avant de placer un bloc, on vérifie qu'il n'a pas déjà été placé. Cela garantit que les blocs ne sont pas déplacés (changement position et zone) sur leur période de construction
         self.is_placed = True
-        self.position = Position(zone,x,y)
+        self.position = position
         
     def isPlaced(self):
         return self.position!= None
