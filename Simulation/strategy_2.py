@@ -8,7 +8,7 @@ from Simulation.constraints_motor import ConstraintsMotor
 #à la date de début de construction d'un bloc,  on vérifie qu'il est placé dans une des zones (y compris la zonne d'échec). Un bloc ne peut pas changer de position donc on vérie cette condition que lors du placement du bloc.
 class Strategy2(Strategy):
     def __init__(self,data):
-        self.name="stratégie 2"
+        self.name=self.__class__.__name__
         self.simu : SimulationContext = SimulationContext(self.name,data)
     
     

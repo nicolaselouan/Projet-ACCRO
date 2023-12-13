@@ -6,9 +6,9 @@ import time
 
 
 #à la date de début de construction d'un bloc,  on vérifie qu'il est placé dans une des zones (y compris la zonne d'échec). Un bloc ne peut pas changer de position donc on vérie cette condition que lors du placement du bloc.
-class StrategyFlorian(Strategy):
+class StrategyMaxime(Strategy):
     def __init__(self,data):
-        self.name="stratégie Florian"
+        self.name=self.__class__.__name__
         self.simu : SimulationContext = SimulationContext(self.name,data)
     
     
@@ -47,6 +47,7 @@ class StrategyFlorian(Strategy):
         # Une fois votre stratégie implémentée, vous pouvez la tester et la comparer à une stratégie simple ne permettant de placer que deux blocs en:
         # remplacant, dans le fichier main, la ligne Simu.compare_solutions([strategies_name[0],strategies_name[0]]) par la ligne Simu.compare_solutions([strategies_name[0],strategies_name[i]]) avec i l'indice du nom de votre stratégie dans la liste strategies_name
         # Les valeurs du dictionnaire correspondent au temps d'execution, au nombre de blocs placés sur le nombre de blocs total et à la superficie des blocs placés sur la superficie des blocs totale
+        
             
         
         self.simu.modified_data=data
