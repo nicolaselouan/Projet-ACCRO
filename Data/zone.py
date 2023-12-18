@@ -9,6 +9,7 @@ class Zone:
         self.height_portique : float =height
         self.unavaibilities: list[Unavaibility]=[]
 
+    # Ajout d'une indisponibilités pour cette zone
     def add_unavaibilities(self, beginning, end):
         self.unavaibilities.append(Unavaibility(beginning, end))
         

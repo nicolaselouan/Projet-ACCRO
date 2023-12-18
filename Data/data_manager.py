@@ -16,6 +16,7 @@ class DataManager(DataManagerInterface):
         # Création d'une zone de dimension à définir où seront stocker les blocs n'ayant pas pu être placés
         self.zones.append(Zone("Zone Echecs",longueur,largeur,None,None))
 
+
     def create_construction_zones(self):
         # Création des zones de construction à partir des DataFrame contenant les données nécessaires
         df_zones=self.excel.convert_file_zones()
@@ -43,16 +44,18 @@ class DataManager(DataManagerInterface):
                                    df_blocs['Départ'][i], 
                                    df_blocs['Date hauteur intermédaire'][i], 
                                    df_blocs['Date hauteur finale'][i]))
-            ## Tous les blocs sont initialement dans la zone contenant les échecs de placement. Il est donc nécessaire d'appeler la méthode creerZoneEchec avant
+        
             
+           
     def add_unavaibilities(self):
-        # Ajout des éventuelles indisponibiltés des zones de construuction
+        # Ajout des éventuelles indisponibiltés des zones de construction
         df_unavaibilities=self.excel.convert_file_unavaibilities()
         nb_unaivabilities=len(df_unavaibilities['zone'])
         for j in range(nb_unaivabilities):
             self.zones[df_unavaibilities['zone'][j]].add_unavaibilities(df_unavaibilities['Début '][j],
                                                                                 df_unavaibilities['fin '][j])
     def set_construction_period(self):
+        # Calcul de la durée totale de construction des blocs
         min_date=sorted(self.blocs, key=attrgetter('arrival_date'))[0].arrival_date
         max_date=sorted(self.blocs, key=attrgetter('departure_date'))[-1].departure_date
         self.construction_period=(min_date,max_date)

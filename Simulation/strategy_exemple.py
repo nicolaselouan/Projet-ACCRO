@@ -15,7 +15,7 @@ class StrategyExemple(Strategy):
     def launch_strategy(self):
         ti=time.time()
         data=self.simu.modified_data
-        constraints_motor=ConstraintsMotor(data.blocs)
+
         
         ###### COMPLETER AVEC VOTRE ALGORITHME #######
         
@@ -33,7 +33,8 @@ class StrategyExemple(Strategy):
         # définir une position (x,y) pour le bloc i dans la zone j:
             # 1) Instancier un objet position
             # pos=Position(data.zones[i],x,y)
-            # 2) Vérifier que les contraintes sont respectées  
+            # 2) Vérifier que les contraintes sont respectées 
+            # constraints_motor=ConstraintsMotor(data.blocs)
             # if constraints_motor.verify_constraints(data.blocs[i],pos)==True:
             # 3) Si elles sont vérifiées, placer le bloc
             #data.blocs[-1].place(pos)
